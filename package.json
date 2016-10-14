@@ -1,0 +1,22 @@
+{
+  "name": "lake-map",
+  "version": "1.0.0",
+  "description": "Lake map is a web application that lets you find out the most interesting places on lake Maggiore",
+  "main": "index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WildBoni/lake-map.git"
+  },
+  "author": "Davide Bonifacio",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/WildBoni/lake-map/issues"
+  },
+  "homepage": "https://github.com/WildBoni/lake-map#readme",
+  "devDependencies": {
+    "gulp": "^3.9.1"
+  }
+}
