@@ -30,9 +30,12 @@ function onAuthStateChanged(user) {
         snapshot.forEach(function(childSnapshot) {
           var placeName = childSnapshot.key;
           var id = childSnapshot.val().id;
+          var category = childSnapshot.val().category;
 
-          var item = document.createElement('li');
+          var item = document.createElement('option');
+          item.value = category;
           item.appendChild(document.createTextNode(placeName));
+
           list.appendChild(item);
 
           // Use Google Maps APIS to create infoWindows
@@ -46,11 +49,27 @@ function onAuthStateChanged(user) {
             if (status === google.maps.places.PlacesServiceStatus.OK) {
               var marker = new google.maps.Marker({
                 map: map,
+                catgr: category,
                 position: place.geometry.location
               });
+
+            /*  (function (cat) {
+                console.log(marker.catgr + ', ' + category);
+                item.addEventListener('click', function(){
+                  var thcat = category;
+                  if (marker.catgr == thcat || category.length === 0) {
+                      marker.setVisible(false);
+                  }
+                  // Categories don't match
+                  else {
+
+                  }
+                });
+              })(category);*/
+
               google.maps.event.addListener(marker, 'click', function() {
                 infowindow.setContent('<div><strong>' + place.name + '</strong><br>' +
-                'Place ID: ' + place.place_id + '<br>' +
+                'Category: ' + category + '<br>' +
                 place.formatted_address + '</div>');
                 infowindow.open(map, this);
               });
