@@ -1,7 +1,5 @@
 var splashPage = document.getElementById('page-splash');
-
- placeName = 'san_carlone';
-
+var placeName = 'san_carlone';
 // Writes the user's data to the database.
 function writeUserData(userId, email) {
   firebase.database().ref('users/' + userId).set({
@@ -22,18 +20,29 @@ function onAuthStateChanged(user) {
     currentUID = user.uid;
     splashPage.style.display = 'none';
     writeUserData(user.uid, user.email);
-    return firebase.database().ref('/places/' + placeName + '/results/0/').once('value').then(function(snapshot) {
-      var formatted_address = snapshot.val().formatted_address;
-      location1 = snapshot.val().geometry.location.lat;
-      location2 = snapshot.val().geometry.location.lng;
-      latLng = new google.maps.LatLng(location1, location2);
-
-      var marker = new google.maps.Marker({
-        position: {lat: location1, lng: location2},
-        title: formatted_address,
-        map:map
+    // Retrieve place id from Firebase
+    return firebase.database().ref('/places/' + placeName + '/').once('value').then(function(snapshot) {
+      var id = snapshot.val().id;
+      // Use Google Maps APIS to create infoWindows
+      var infowindow = new google.maps.InfoWindow();
+      var service = new google.maps.places.PlacesService(map);
+      // Retrieve Place details from Google Maps using the id stored in Firebase
+      service.getDetails({
+        placeId: id
+      }, function(place, status) {
+        if (status === google.maps.places.PlacesServiceStatus.OK) {
+          var marker = new google.maps.Marker({
+            map: map,
+            position: place.geometry.location
+          });
+          google.maps.event.addListener(marker, 'click', function() {
+            infowindow.setContent('<div><strong>' + place.name + '</strong><br>' +
+              'Place ID: ' + place.place_id + '<br>' +
+            place.formatted_address + '</div>');
+            infowindow.open(map, this);
+          });
+        }
       });
-      console.log(marker.position);
     });
   } else {
     // Display the splash page where you can sign-in.

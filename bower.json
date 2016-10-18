@@ -4,7 +4,7 @@
   "authors": [
     "Davide Bonifacio - Studiokey <web@davidebonifacio.it>"
   ],
-  "description": "Lake map is a web appliacation that lets you find out the most interesting places on lake Maggiore",
+  "description": "Lake map is a web application that lets you find out the most interesting places on lake Maggiore",
   "main": "",
   "license": "MIT",
   "private": true,
