@@ -25,14 +25,15 @@ function onAuthStateChanged(user) {
     return firebase.database().ref('/places/' + placeName + '/results/0/').once('value').then(function(snapshot) {
       var formatted_address = snapshot.val().formatted_address;
       location1 = snapshot.val().geometry.location.lat;
-      location2 = snapshot.val().geometry.location.lat;
+      location2 = snapshot.val().geometry.location.lng;
       latLng = new google.maps.LatLng(location1, location2);
 
       var marker = new google.maps.Marker({
-        position: {lat: 45.924453, lng: 8.556276},
+        position: {lat: location1, lng: location2},
         title: formatted_address,
         map:map
       });
+      console.log(marker.position);
     });
   } else {
     // Display the splash page where you can sign-in.
