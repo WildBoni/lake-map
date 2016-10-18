@@ -1,5 +1,4 @@
 var splashPage = document.getElementById('page-splash');
-var placeName = 'san_carlone';
 // Writes the user's data to the database.
 function writeUserData(userId, email) {
   firebase.database().ref('users/' + userId).set({
@@ -20,30 +19,36 @@ function onAuthStateChanged(user) {
     currentUID = user.uid;
     splashPage.style.display = 'none';
     writeUserData(user.uid, user.email);
-    // Retrieve place id from Firebase
-    return firebase.database().ref('/places/' + placeName + '/').once('value').then(function(snapshot) {
-      var id = snapshot.val().id;
-      // Use Google Maps APIS to create infoWindows
-      var infowindow = new google.maps.InfoWindow();
-      var service = new google.maps.places.PlacesService(map);
-      // Retrieve Place details from Google Maps using the id stored in Firebase
-      service.getDetails({
-        placeId: id
-      }, function(place, status) {
-        if (status === google.maps.places.PlacesServiceStatus.OK) {
-          var marker = new google.maps.Marker({
-            map: map,
-            position: place.geometry.location
+    // Loop through places in Firebase Database
+    var place = firebase.database().ref("places").orderByKey();
+    place.once("value")
+      .then(function(snapshot) {
+        snapshot.forEach(function(childSnapshot) {
+          var placeName = childSnapshot.key;
+          var id = childSnapshot.val().id;
+          // Use Google Maps APIS to create infoWindows
+          var infowindow = new google.maps.InfoWindow();
+          var service = new google.maps.places.PlacesService(map);
+          // Retrieve Place details from Google Maps using the id stored in Firebase
+          service.getDetails({
+            placeId: id
+          }, function(place, status) {
+            // check if everything is ok, then create marker and append its infowindow
+            if (status === google.maps.places.PlacesServiceStatus.OK) {
+              var marker = new google.maps.Marker({
+                map: map,
+                position: place.geometry.location
+              });
+              google.maps.event.addListener(marker, 'click', function() {
+                infowindow.setContent('<div><strong>' + place.name + '</strong><br>' +
+                'Place ID: ' + place.place_id + '<br>' +
+                place.formatted_address + '</div>');
+                infowindow.open(map, this);
+              });
+            }
           });
-          google.maps.event.addListener(marker, 'click', function() {
-            infowindow.setContent('<div><strong>' + place.name + '</strong><br>' +
-              'Place ID: ' + place.place_id + '<br>' +
-            place.formatted_address + '</div>');
-            infowindow.open(map, this);
-          });
-        }
+        });
       });
-    });
   } else {
     // Display the splash page where you can sign-in.
     splashPage.style.display = '';
