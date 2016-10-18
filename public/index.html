@@ -13,11 +13,12 @@ limitations under the License.
 -->
 <html>
 <head>
-  <meta charset=utf-8 />
+  <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Email/Password Authentication Example</title>
   <link rel="stylesheet" type="text/css" href="css/style.css">
-
+  <!-- Knockout -->
+  <script type="text/javascript" src="../bower_components/knockout/dist/knockout.js"></script>
   <!-- Material Design Theming -->
   <link rel="stylesheet" href="https://code.getmdl.io/1.1.3/material.orange-indigo.min.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
@@ -238,6 +239,9 @@ limitations under the License.
 </div>
 <button class="mdl-button mdl-js-button mdl-button--raised" id="signOut" name="signout"></button>
 <div id="map"></div>
+<div id="list">
+
+</div>
 <script>
   var map;
   var marker = {};

@@ -19,6 +19,10 @@ function onAuthStateChanged(user) {
     currentUID = user.uid;
     splashPage.style.display = 'none';
     writeUserData(user.uid, user.email);
+
+    var list = document.createElement('ul');
+    document.getElementById('list').appendChild(list);
+
     // Loop through places in Firebase Database
     var place = firebase.database().ref("places").orderByKey();
     place.once("value")
@@ -26,6 +30,11 @@ function onAuthStateChanged(user) {
         snapshot.forEach(function(childSnapshot) {
           var placeName = childSnapshot.key;
           var id = childSnapshot.val().id;
+
+          var item = document.createElement('li');
+          item.appendChild(document.createTextNode(placeName));
+          list.appendChild(item);
+
           // Use Google Maps APIS to create infoWindows
           var infowindow = new google.maps.InfoWindow();
           var service = new google.maps.places.PlacesService(map);
