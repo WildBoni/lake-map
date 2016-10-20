@@ -25,20 +25,12 @@ limitations under the License.
 <div id="map"></div>
 <div id="list">
   <ul data-bind="foreach: places">
-    <li data-bind="text:  name"></li>
+    <li data-bind="text:  name, click: $parent.placeSelect"></li>
   </ul>
 </div>
-<script>
-  var map;
-  var marker = {};
-  function initMap() {
-    map = new google.maps.Map(document.getElementById('map'), {
-      center: {lat: 45.924453, lng: 8.556276},
-      zoom: 11
-    });
-  }
-
-</script>
+<div data-bind="with: currentPlace">
+  <h2 data-bind="text: name"></h2>
+</div>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDu0WvblPw9tITAxiWP6YwDzBNGG9Oj9cQ&libraries=places&callback=initMap" async defer>
 </script>
 <script src="js/script.js"></script>
