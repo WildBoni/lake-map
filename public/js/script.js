@@ -19,17 +19,17 @@ var ViewModel = function() {
   });
   this.currentPlace = ko.observable( this.placesList()[0] );
   this.placeSelect = function(place){
-    self.currentPlace(place);
-    toggleStatus();
+    self.currentPlace();
+    toggleStatus(place);
   };
   //http://stackoverflow.com/questions/14867906/knockoutjs-value-toggling-in-data-bind
   self.status = ko.observable(true);
   self.status = true;
-  toggleStatus = function () {
+  toggleStatus = function (place) {
     if(self.status == true) {
-      hideListings();
+      hideListings(place);
     } else {
-      showListings();
+      showListings(place);
     }
     self.status = !self.status;
   };
@@ -44,15 +44,22 @@ ko.applyBindings(new ViewModel());
 
 var map;
 
-function showListings() {
+function showListings(place) {
+  var result = places.filter(function( cat ) {
+    return cat.category == place.category;
+  });
+  console.log(result);
   // Extend the boundaries of the map for each marker and display the marker
-  for (var i = 0; i < markers.length; i++) {
+  for (var i = 0; i < result.length; i++) {
     markers[i].setMap(map);
   }
 }
 // This function will loop through the listings and hide them all.
-function hideListings() {
-  for (var i = 0; i < markers.length; i++) {
+function hideListings(place) {
+  var result = places.filter(function( cat ) {
+    return cat.category == place.category;
+  });
+  for (var i = 0; i < result.length; i++) {
     markers[i].setMap(null);
   }
 }
