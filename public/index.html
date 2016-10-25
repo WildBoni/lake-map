@@ -22,6 +22,10 @@ limitations under the License.
 
 </head>
 <body>
+  <div>
+    <input id="show-listings" type="button" value="Show Listings">
+    <input id="hide-listings" type="button" value="Hide Listings">
+  </div>
 <div id="map"></div>
 <div id="list">
   <ul data-bind="foreach: places">
@@ -29,7 +33,7 @@ limitations under the License.
   </ul>
 </div>
 <div data-bind="with: currentPlace">
-  <h2 data-bind="text: name"></h2>
+  <h2 data-bind="text: category"></h2>
 </div>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDu0WvblPw9tITAxiWP6YwDzBNGG9Oj9cQ&libraries=places&callback=initMap" async defer>
 </script>
