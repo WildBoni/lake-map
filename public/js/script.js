@@ -1,68 +1,47 @@
 var places = [
-    { name: "isola_bella", category: "panorama", id: "ChIJI_225H91hkcRVKb21p-agns"},
-    { name: "mottarone", category: "panorama", id: "ChIJ8UByCb4KhkcR0E2nV37mBR0"},
-    { name: "san_carlone", category: "architecture", id: "ChIJhQvajYRxhkcRwvU6dVVjF5M"}
+    { name: "isola_bella", category: "panorama", id: "ChIJI_225H91hkcRVKb21p-agns", lat: "45.89644639999999", lng: "8.526133099999999", address: "Palazzo Borromeo all'Isola Bella, Isola Bella, 28838 Stresa VB, Italia", show: true},
+    { name: "mottarone", category: "panorama", id: "ChIJ8UByCb4KhkcR0E2nV37mBR0", lat: "45.8833333", lng: "8.449999999999999", address: "Mottarone, 28838 Stresa VB, Italia", show: true},
+    { name: "san_carlone", category: "architecture", id: "ChIJhQvajYRxhkcRwvU6dVVjF5M", lat: "45.7702621", lng: "8.5431992", address: "Statua di San Carlo Borromeo, Piazzale San Carlo, 28041 Arona NO, Italia", show: true}
 ];
 var markers = [];
-var thisCategory = "";
-var name = "";
+
 var Place = function(data) {
   this.name = ko.observable(data.name);
   this.category = ko.observable(data.category);
+  this.show = ko.observable(data.show);
+  this.lat = ko.observable(data.lat);
+  this.lng = ko.observable(data.lng);
+  this.address = ko.observable(data.address);
 };
 
 var ViewModel = function() {
   var self = this;
   this.placesList = ko.observableArray([]);
+
+  self.catFilter = ko.observable();
+
   places.forEach(function(placeItem) {
     self.placesList.push( new Place(placeItem) );
   });
-  this.currentPlace = ko.observable( this.placesList()[0] );
-  this.placeSelect = function(place){
-    self.currentPlace();
-    toggleStatus(place);
-  };
-  //http://stackoverflow.com/questions/14867906/knockoutjs-value-toggling-in-data-bind
-  self.status = ko.observable(true);
-  self.status = true;
-  toggleStatus = function (place) {
-    if(self.status == true) {
-      hideListings(place);
+//http://jsfiddle.net/R8dpQ/
+  self.filterCats = ko.computed(function () {
+    if (!self.catFilter()) {
+      return self.placesList();
     } else {
-      showListings(place);
+      return ko.utils.arrayFilter(self.placesList(), function (place) {
+        return place.category == self.catFilter();
+      });
     }
-    self.status = !self.status;
+  });
+
+  self.filter = function (category) {
+    self.catFilter(category);
   };
 };
-
-var i, marker;
-marker = "";
-marker.ctgr = "";
-marker.name = "";
 
 ko.applyBindings(new ViewModel());
 
 var map;
-
-function showListings(place) {
-  var result = places.filter(function( cat ) {
-    return cat.category == place.category;
-  });
-  console.log(result);
-  // Extend the boundaries of the map for each marker and display the marker
-  for (var i = 0; i < result.length; i++) {
-    markers[i].setMap(map);
-  }
-}
-// This function will loop through the listings and hide them all.
-function hideListings(place) {
-  var result = places.filter(function( cat ) {
-    return cat.category == place.category;
-  });
-  for (var i = 0; i < result.length; i++) {
-    markers[i].setMap(null);
-  }
-}
 
 function initMap() {
   map = new google.maps.Map(document.getElementById('map'), {
@@ -70,34 +49,41 @@ function initMap() {
     zoom: 11
   });
 
-  document.getElementById('show-listings').addEventListener('click', showListings);
-  document.getElementById('hide-listings').addEventListener('click', hideListings);
-
-  var infowindow = new google.maps.InfoWindow();
-  var service = new google.maps.places.PlacesService(map);
-
-  for (i = 0; i < places.length; i++) {
-    var thisPlace = places[i];
-    var thisCategory = thisPlace.category;
-    var thisName = thisPlace.name;
-    service.getDetails({
-      placeId: thisPlace.id
-    }, function(place, status) {
-      if (status === google.maps.places.PlacesServiceStatus.OK) {
-        marker = new google.maps.Marker({
-          map: map,
-          position: place.geometry.location,
-          catgr: thisCategory,
-          name: thisName
-        });
-        markers.push(marker);
-        google.maps.event.addListener(marker, 'click', function() {
-          infowindow.setContent('<div><strong>' + thisPlace.name + '</strong><br>' +
-          'Category: ' +  thisPlace.category + '<br>' +
-          place.formatted_address + '</div>');
-          infowindow.open(map, this);
-        });
-      }
+  for (var i = 0; i < places.length; i++) {
+    var place = places[i];
+    var lat = parseFloat(place.lat);
+    var lng = parseFloat(place.lng);
+    var infowindow = new google.maps.InfoWindow();
+    var marker = new google.maps.Marker({
+      map: map,
+      position: {lat: lat, lng: lng},
+      title: place.name,
+      category: place.category,
+      address: place.address
     });
+    //attachInfoWindow(marker);
+    markers.push(marker);
+    marker.addListener('click', function() {
+      map.panTo(new google.maps.LatLng(lat, lng));
+      populateInfoWindow(this, infowindow);
+    });
+  }
+
+  function populateInfoWindow(marker, infowindow) {
+    // Check to make sure the infowindow is not already opened on this marker.
+    if (infowindow.marker != marker) {
+      infowindow.marker = marker;
+      infowindow.setContent('<div><strong>' + marker.title + '</strong><br>' +
+        'Category: ' + marker.category  + '<br>' +
+        marker.address + '</div>');
+      infowindow.open(map, marker);
+      // http://stackoverflow.com/questions/7339200/bounce-a-pin-in-google-maps-once
+      marker.setAnimation(google.maps.Animation.BOUNCE);
+      setTimeout(function(){ marker.setAnimation(null); }, 1400);
+      // Make sure the marker property is cleared if the infowindow is closed.
+      infowindow.addListener('closeclick', function() {
+        infowindow.marker = null;
+      });
+    }
   }
 }
