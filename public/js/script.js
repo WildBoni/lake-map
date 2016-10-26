@@ -13,6 +13,10 @@ var Place = function(data) {
 
 var ViewModel = function() {
   var self = this;
+
+  this.radioCat = ko.observable(true);
+  this.catFilter = ko.observable("all");
+  console.log(this.catFilter());
   this.placesList = ko.observableArray([]);
   places.forEach(function(placeItem) {
     self.placesList.push( new Place(placeItem) );
@@ -33,6 +37,11 @@ var ViewModel = function() {
     }
     self.status = !self.status;
   };
+
+  self.DiscountLevel = ko.computed(function () {
+      return self.catFilter();
+  });
+
 };
 
 var i, marker;
@@ -46,7 +55,7 @@ var map;
 
 function showListings(place) {
   var result = places.filter(function( cat ) {
-    return cat.category == place.category;
+    return cat.name == place.name;
   });
   console.log(result);
   // Extend the boundaries of the map for each marker and display the marker
@@ -57,7 +66,7 @@ function showListings(place) {
 // This function will loop through the listings and hide them all.
 function hideListings(place) {
   var result = places.filter(function( cat ) {
-    return cat.category == place.category;
+    return cat.name == place.name;
   });
   for (var i = 0; i < result.length; i++) {
     markers[i].setMap(null);
@@ -70,8 +79,8 @@ function initMap() {
     zoom: 11
   });
 
-  document.getElementById('show-listings').addEventListener('click', showListings);
-  document.getElementById('hide-listings').addEventListener('click', hideListings);
+/*  document.getElementById('show-listings').addEventListener('click', showListings);
+  document.getElementById('hide-listings').addEventListener('click', hideListings);*/
 
   var infowindow = new google.maps.InfoWindow();
   var service = new google.maps.places.PlacesService(map);
@@ -90,9 +99,10 @@ function initMap() {
           catgr: thisCategory,
           name: thisName
         });
+        console.log(catgr);
         markers.push(marker);
         google.maps.event.addListener(marker, 'click', function() {
-          infowindow.setContent('<div><strong>' + thisPlace.name + '</strong><br>' +
+          infowindow.setContent('<div><strong>' + marker.name + '</strong><br>' +
           'Category: ' +  thisPlace.category + '<br>' +
           place.formatted_address + '</div>');
           infowindow.open(map, this);

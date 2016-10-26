@@ -22,9 +22,11 @@ limitations under the License.
 
 </head>
 <body>
-  <div>
-    <input id="show-listings" type="button" value="Show Listings">
-    <input id="hide-listings" type="button" value="Hide Listings">
+  <div data-bind="visible: radioCat">
+      Categories:
+      <div><input type="radio" name="catGroup" value="all" data-bind="checked: catFilter" /> All</div>
+      <div><input type="radio" name="catGroup" value="panorama" data-bind="checked: catFilter" /> Panorama</div>
+      <div><input type="radio" name="catGroup" value="architecture" data-bind="checked: catFilter" /> Architecture</div>
   </div>
 <div id="map"></div>
 <div id="list">
