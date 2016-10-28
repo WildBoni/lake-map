@@ -3,29 +3,33 @@ var places = [
     { name: "mottarone", category: "panorama", id: "ChIJ8UByCb4KhkcR0E2nV37mBR0", lat: "45.8833333", lng: "8.449999999999999", address: "Mottarone, 28838 Stresa VB, Italia"},
     { name: "san_carlone", category: "architecture", id: "ChIJhQvajYRxhkcRwvU6dVVjF5M", lat: "45.7702621", lng: "8.5431992", address: "Statua di San Carlo Borromeo, Piazzale San Carlo, 28041 Arona NO, Italia"}
 ];
-var markers = [];
+
 var map;
-//var infowindow = new google.maps.InfoWindow();
+var infowindow = new google.maps.InfoWindow();
 
 var ViewModel = function() {
   var self = this;
   this.placesList = ko.observableArray([]);
-  this.markersList = ko.observableArray([]);
+  this.filteredCats = ko.observableArray([]);
   self.catFilter = ko.observable();
 
   //Event Listener for initializing map
   //http://stackoverflow.com/questions/36267158/uncaught-referenceerror-google-is-not-defined
-  function initMap() {
+  self.initMap = function() {
     map = new google.maps.Map(document.getElementById('map'), {
       center: {lat: 45.924453, lng: 8.556276},
       zoom: 11
     });
-  }
+  };
 
-  places.forEach(function(placeItem) {
-    self.placesList.push( new Place(placeItem) );
-  });
+  self.loadPlaces = function() {
+    places.forEach(function(placeItem) {
+      self.placesList.push( new Place(placeItem) );
+    });
+  };
 
+/*
+  //http://www.knockmeout.net/2011/04/utility-functions-in-knockoutjs.html
   self.filterCats = ko.computed(function () {
     if (!self.catFilter()) {
       return self.placesList();
@@ -38,11 +42,50 @@ var ViewModel = function() {
 
   self.filter = function (category) {
     self.catFilter(category);
+  };*/
+
+  self.filterCats = function(category) {
+    self.catFilter(category);
+
+
+    self.filteredCats([]);
+    var len = self.placesList().length;
+
+    var selected = ko.utils.arrayFilter(self.placesList(), function (place) {
+      return place.category() == self.catFilter();
+    });
+    var selectedLen = selected.length;
+
+    if (!self.catFilter()) {
+      for(var i = 0; i < len; i++) {
+        self.filteredCats.push(self.placesList()[i]);
+        self.placesList()[i].marker().setMap(map);
+      //return self.placesList();
+      }
+    } else {
+      for(var i = 0; i < len; i++) {
+        self.placesList()[i].marker().setMap(null);
+      }
+      for(var i = 0; i < selectedLen; i++) {
+        self.placesList()[i].marker().setMap(map);
+      }
+    }
+  };
+
+  self.filter = function (category) {
+    self.filterCats(category);
+  };
+
+  self.selectedPlace = function(place){
+    map.panTo(new google.maps.LatLng(place.marker().position.lat(), place.marker().position.lng()));
+    populateInfoWindow(place.marker(), infowindow);
   };
 
   // https://developers.google.com/maps/documentation/javascript/examples/event-domListener
   google.maps.event.addDomListener(window, 'load', function(){
     self.initMap();
+    self.loadPlaces();
+  //  self.filteredCats(self.placesList());
   });
 };
 
@@ -54,28 +97,28 @@ var Place = function(data) {
   this.lng = ko.observable(data.lng);
   this.address = ko.observable(data.address);
 
-  var numlat = parseFloat(this.lat);
-  var numlng = parseFloat(this.lng);
+  var numlat = parseFloat(this.lat());
+  var numlng = parseFloat(this.lng());
 
   var marker = new google.maps.Marker({
     map: map,
     position: {lat: numlat, lng: numlng},
-    title: this.name,
-    category: this.category,
-    address: this.address
+    title: this.name(),
+    category: this.category(),
+    address: this.address()
   });
 
   this.marker = ko.observable(marker);
 
-/*  this.marker.addListener('click', function() {
+  this.marker().addListener('click', function() {
     map.panTo(new google.maps.LatLng(numlat, numlng));
     populateInfoWindow(this, infowindow);
-  });*/
+  });
 };
 
 ko.applyBindings(new ViewModel());
 
-/*
+
 function populateInfoWindow(marker, infowindow) {
   // Check to make sure the infowindow is not already opened on this marker.
   if (infowindow.marker != marker) {
@@ -92,4 +135,4 @@ function populateInfoWindow(marker, infowindow) {
       infowindow.marker = null;
     });
   }
-}*/
+}

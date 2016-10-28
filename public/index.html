@@ -17,7 +17,7 @@ limitations under the License.
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lake Map</title>
   <link rel="stylesheet" type="text/css" href="css/style.css">
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDu0WvblPw9tITAxiWP6YwDzBNGG9Oj9cQ&libraries=places">
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDu0WvblPw9tITAxiWP6YwDzBNGG9Oj9cQ">
   </script>
   <!-- Knockout -->
   <script type="text/javascript" src="../bower_components/knockout/dist/knockout.js"></script>
@@ -28,13 +28,13 @@ limitations under the License.
 <button data-bind="click: function() { filter('architecture') }">Pano</button>
 <div id="map"></div>
 <div id="list">
-  <ul data-bind="foreach: places">
-    <li data-bind="text:  name"></li>
+  <ul data-bind="foreach: placesList">
+    <li data-bind="text:  name, click: $parent.selectedPlace"></li>
   </ul>
 </div>
-<div data-bind="foreach: filterCats">
+<!--<div data-bind="foreach: filterCats">
   <div data-bind="text: name"></div>
-</div>
+</div>-->
 <script src="js/script.js"></script>
 </body>
 </html>
