@@ -11,14 +11,16 @@ var bounds = new google.maps.LatLngBounds();
 //FourSquare credentials
 var clientId = 'CEE3OEEHN1QL2SS1MWKVTAH5L0MYPWFQFSGI2NZWKWMSEXIL';
 var clientSecret = '4NPFBTCE53TLCTJ5DSGEHHVKYXWTE5X5ZDIHP35SE1N0UABR';
-var $fsName = $('#fsName');
 
 var ViewModel = function() {
+  var venues = 'Waiting for input';
   var self = this;
-
-  this.placesList = ko.observableArray([]);
-  this.filteredCats = ko.observableArray([]);
+  self.placesList = ko.observableArray([]);
+  self.filteredCats = ko.observableArray([]);
   self.catFilter = ko.observable();
+  self.fsName = ko.observable(venues);
+  self.fsRating = ko.observable(venues);
+
 
   //Event Listener for initializing map
   //http://stackoverflow.com/questions/36267158/uncaught-referenceerror-google-is-not-defined
@@ -26,6 +28,36 @@ var ViewModel = function() {
     map = new google.maps.Map(document.getElementById('map'), {
       center: {lat: 45.924453, lng: 8.556276},
       zoom: 11
+    });
+  };
+
+  self.createMarkersClick = function(){
+    self.placesList().forEach(function(place){
+      google.maps.event.addListener(place.marker(), 'click', function(){
+        self.clickPlace(place);
+      });
+    });
+  };
+
+  self.clickPlace = function(place){
+    infowindow.setContent(place.marker().details);
+    infowindow.open(map, place.marker());
+    // http://stackoverflow.com/questions/7339200/bounce-a-pin-in-google-maps-once
+    place.marker().setAnimation(google.maps.Animation.BOUNCE);
+    setTimeout(function(){ place.marker().setAnimation(null); }, 1400);
+    self.fourSquareDetails(place.element().url);
+    /*// Make sure the marker property is cleared if the infowindow is closed.
+    infowindow.addListener('closeclick', function() {
+      infowindow.place.marker() = null;
+    });*/
+  };
+
+  self.fourSquareDetails = function(url){
+    $.getJSON(url, function(data) {
+      var venue = data.response.venue.name;
+      var rating = data.response.venue.rating;
+      self.fsName(venue);
+      self.fsRating(rating);
     });
   };
 
@@ -70,9 +102,9 @@ var ViewModel = function() {
 
   self.selectedPlace = function(place){
     map.panTo(new google.maps.LatLng(place.marker().position.lat(), place.marker().position.lng()));
-    map.setZoom(13);
-    fourSquareDetails(place.marker().url);
-    populateInfoWindow(place.marker(), infowindow);
+    map.setZoom(12);
+    self.clickPlace(place);
+    //fourSquareDetails(place.marker().url);
   };
 
   // https://developers.google.com/maps/documentation/javascript/examples/event-domListener
@@ -81,6 +113,7 @@ var ViewModel = function() {
     self.loadPlaces();
     map.fitBounds(bounds);
     self.filteredCats(self.placesList());
+    self.createMarkersClick();
   });
 
 };
@@ -94,47 +127,49 @@ var Place = function(data) {
   this.lng = ko.observable(data.lng);
   this.address = ko.observable(data.address);
 
-
   var numlat = parseFloat(this.lat());
   var numlng = parseFloat(this.lng());
 
   var marker = new google.maps.Marker({
     map: map,
     position: {lat: numlat, lng: numlng},
-    title: this.name(),
-    category: this.category(),
-    address: this.address(),
+    details: '<div><strong>' + this.name() + '</strong><br>' +
+          'Category: ' + this.category()  + '<br>' +
+          this.address() + '</div>'
+  });
+
+  var element = {
     id: this.id(),
     url: 'https://api.foursquare.com/v2/venues/' + this.id() + '?client_id='+ clientId +
     '&client_secret=' + clientSecret + '&v=20130815'
-  });
+  };
+
   bounds.extend(marker.getPosition());
 
   this.marker = ko.observable(marker);
+  this.element = ko.observable(element);
 
-  this.marker().addListener('click', function() {
+/*  this.marker().addListener('click', function() {
     map.panTo(new google.maps.LatLng(numlat, numlng));
     fourSquareDetails(this.url);
     populateInfoWindow(this, infowindow);
-  });
+  });*/
 };
 
 ko.applyBindings(new ViewModel());
 
 // https://developer.foursquare.com/overview/tutorial
 
-function fourSquareDetails(id){
+/*function fourSquareDetails(id){
   $fsName.text("");
   $.getJSON(id, function(data) {
     var venues = data.response.venue.name;
     $fsName.text("name:" + venues);
     console.log(venues);
   });
-}
+}*/
 
-
-
-function populateInfoWindow(marker, infowindow) {
+/*function populateInfoWindow(marker, infowindow) {
   // Check to make sure the infowindow is not already opened on this marker.
   if (infowindow.marker != marker) {
     infowindow.marker = marker;
@@ -150,4 +185,4 @@ function populateInfoWindow(marker, infowindow) {
       infowindow.marker = null;
     });
   }
-}
+}*/
