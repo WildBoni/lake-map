@@ -1,12 +1,17 @@
 var places = [
-    { name: "isola_bella", category: "panorama", id: "ChIJI_225H91hkcRVKb21p-agns", lat: "45.89644639999999", lng: "8.526133099999999", address: "Palazzo Borromeo all'Isola Bella, Isola Bella, 28838 Stresa VB, Italia"},
-    { name: "mottarone", category: "panorama", id: "ChIJ8UByCb4KhkcR0E2nV37mBR0", lat: "45.8833333", lng: "8.449999999999999", address: "Mottarone, 28838 Stresa VB, Italia"},
-    { name: "san_carlone", category: "architecture", id: "ChIJhQvajYRxhkcRwvU6dVVjF5M", lat: "45.7702621", lng: "8.5431992", address: "Statua di San Carlo Borromeo, Piazzale San Carlo, 28041 Arona NO, Italia"}
+    { name: "isola_bella", category: "panorama", id: "4bb5f9ff1344b7139acb9c04", lat: "45.89644639999999", lng: "8.526133099999999", address: "Palazzo Borromeo all'Isola Bella, Isola Bella, 28838 Stresa VB, Italia"},
+    { name: "mottarone", category: "panorama", id: "4c274f81905a0f47eca56460", lat: "45.8833333", lng: "8.449999999999999", address: "Mottarone, 28838 Stresa VB, Italia"},
+    { name: "san_carlone", category: "architecture", id: "4da166849aa4721e1e61fa19", lat: "45.7702621", lng: "8.5431992", address: "Statua di San Carlo Borromeo, Piazzale San Carlo, 28041 Arona NO, Italia"}
 ];
 
 var map;
 var infowindow = new google.maps.InfoWindow();
 var bounds = new google.maps.LatLngBounds();
+
+//FourSquare credentials
+var clientId = 'CEE3OEEHN1QL2SS1MWKVTAH5L0MYPWFQFSGI2NZWKWMSEXIL';
+var clientSecret = '4NPFBTCE53TLCTJ5DSGEHHVKYXWTE5X5ZDIHP35SE1N0UABR';
+var $fsName = $('#fsName');
 
 var ViewModel = function() {
   var self = this;
@@ -24,30 +29,34 @@ var ViewModel = function() {
     });
   };
 
+  //Populate the observable array with places data
   self.loadPlaces = function() {
     places.forEach(function(placeItem) {
       self.placesList.push( new Place(placeItem) );
     });
   };
 
+  //filtering markers by chosen category
   //http://www.knockmeout.net/2011/04/utility-functions-in-knockoutjs.html
   self.filterCats = function(category) {
     self.catFilter(category);
-
+    //empty the observable array
     self.filteredCats([]);
+
     var len = self.placesList().length;
+    // filter placesList array based on selected catagory
     var selected = ko.utils.arrayFilter(self.placesList(), function (place) {
       return place.category() == self.catFilter();
     });
-    var selectedLen = selected.length;
-
+    //loop through the places list
     for(var i = 0; i < len; i++) {
+      // matching category filter
       if (self.placesList()[i].category().indexOf(category) > -1) {
         self.filteredCats.push(self.placesList()[i]);
         self.placesList()[i].marker().setMap(map);
         map.fitBounds(bounds);
 
-      //return self.placesList();
+      //hide other markers
       } else {
         self.placesList()[i].marker().setMap(null);
         map.fitBounds(bounds);
@@ -62,6 +71,7 @@ var ViewModel = function() {
   self.selectedPlace = function(place){
     map.panTo(new google.maps.LatLng(place.marker().position.lat(), place.marker().position.lng()));
     map.setZoom(13);
+    fourSquareDetails(place.marker().url);
     populateInfoWindow(place.marker(), infowindow);
   };
 
@@ -78,10 +88,12 @@ var ViewModel = function() {
 var Place = function(data) {
   this.name = ko.observable(data.name);
   this.category = ko.observable(data.category);
+  this.id = ko.observable(data.id);
   this.show = ko.observable(data.show);
   this.lat = ko.observable(data.lat);
   this.lng = ko.observable(data.lng);
   this.address = ko.observable(data.address);
+
 
   var numlat = parseFloat(this.lat());
   var numlng = parseFloat(this.lng());
@@ -91,7 +103,10 @@ var Place = function(data) {
     position: {lat: numlat, lng: numlng},
     title: this.name(),
     category: this.category(),
-    address: this.address()
+    address: this.address(),
+    id: this.id(),
+    url: 'https://api.foursquare.com/v2/venues/' + this.id() + '?client_id='+ clientId +
+    '&client_secret=' + clientSecret + '&v=20130815'
   });
   bounds.extend(marker.getPosition());
 
@@ -99,11 +114,24 @@ var Place = function(data) {
 
   this.marker().addListener('click', function() {
     map.panTo(new google.maps.LatLng(numlat, numlng));
+    fourSquareDetails(this.url);
     populateInfoWindow(this, infowindow);
   });
 };
 
 ko.applyBindings(new ViewModel());
+
+// https://developer.foursquare.com/overview/tutorial
+
+function fourSquareDetails(id){
+  $fsName.text("");
+  $.getJSON(id, function(data) {
+    var venues = data.response.venue.name;
+    $fsName.text("name:" + venues);
+    console.log(venues);
+  });
+}
+
 
 
 function populateInfoWindow(marker, infowindow) {
