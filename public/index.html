@@ -42,6 +42,7 @@ limitations under the License.
 <button data-bind="click: function() { filter('') }">All</button>
 <button data-bind="click: function() { filter('panorama') }">Panorama</button>
 <button data-bind="click: function() { filter('architecture') }">Architecture</button>
+<button data-bind="click: function() { filter('restaurant') }">Restaurant</button>
 <div id="map"></div>
 <div data-bind="click: function() { filter('') }">All</div>
 <div id="list">
@@ -50,7 +51,7 @@ limitations under the License.
   </ul>
 </div>
 <div>
-  <h1>FourSquare</h1>
+  <h1 id ="foursquare">FourSquare</h1>
   <p>Name: <span data-bind="text: fsName"></span></p>
   <p>Rating: <span data-bind="text: fsRating"></span></p>
 </div>
