@@ -1,9 +1,10 @@
 var places = [
-    { name: "isola_bella", category: "panorama", id: "4bb5f9ff1344b7139acb9c04", lat: "45.89644639999999", lng: "8.526133099999999", address: "Palazzo Borromeo all'Isola Bella, Isola Bella, 28838 Stresa VB, Italia"},
+    { name: "isola_bella", category: "panorama", id: "4bb5f9ff1344b7139acb9c04", lat: "45.89644639999999", lng: "8.526133099999999", address: "Isola Bella, 28838 Stresa VB, Italia"},
     { name: "mottarone", category: "panorama", id: "4c274f81905a0f47eca56460", lat: "45.8833333", lng: "8.449999999999999", address: "Mottarone, 28838 Stresa VB, Italia"},
     { name: "san_carlone", category: "architecture", id: "4da166849aa4721e1e61fa19", lat: "45.7702621", lng: "8.5431992", address: "Statua di San Carlo Borromeo, Piazzale San Carlo, 28041 Arona NO, Italia"}
 ];
 
+// Google maps basic settings
 var map;
 var infowindow = new google.maps.InfoWindow();
 var bounds = new google.maps.LatLngBounds();
@@ -11,6 +12,31 @@ var bounds = new google.maps.LatLngBounds();
 //FourSquare credentials
 var clientId = 'CEE3OEEHN1QL2SS1MWKVTAH5L0MYPWFQFSGI2NZWKWMSEXIL';
 var clientSecret = '4NPFBTCE53TLCTJ5DSGEHHVKYXWTE5X5ZDIHP35SE1N0UABR';
+
+// custom markers http://map-icons.com/
+var path;
+var fillColor;
+var map_icon_label;
+
+var createIcons = function(category) {
+  switch(category) {
+    case "architecture":
+      path = SQUARE_PIN;
+      fillColor = '#b94545';
+      map_icon_label = '<span class="map-icon map-icon-point-of-interest"></span>';
+    break;
+    case "panorama":
+      path = MAP_PIN;
+      fillColor = '#2e8234';
+      map_icon_label = '<span class="map-icon map-icon-local-government"></span>';
+    break;
+    default:
+      path = ROUTE;
+      fillColor = '#602e82';
+      map_icon_label = '<span class="map-icon map-icon-food"></span>';
+    break;
+  }
+};
 
 var ViewModel = function() {
   var venues = 'Waiting for input';
@@ -51,7 +77,7 @@ var ViewModel = function() {
       infowindow.place.marker() = null;
     });*/
   };
-
+  // https://developer.foursquare.com/overview/tutorial
   self.fourSquareDetails = function(url){
     $.getJSON(url, function(data) {
       var venue = data.response.venue.name;
@@ -127,12 +153,22 @@ var Place = function(data) {
   this.lng = ko.observable(data.lng);
   this.address = ko.observable(data.address);
 
+  createIcons(this.category());
+
   var numlat = parseFloat(this.lat());
   var numlng = parseFloat(this.lng());
 
-  var marker = new google.maps.Marker({
+  var marker = new Marker({
     map: map,
     position: {lat: numlat, lng: numlng},
+    icon: {
+      path: path,
+      fillColor: fillColor,
+      fillOpacity: 1,
+      strokeColor: '',
+      strokeWeight: 0
+    },
+    map_icon_label: map_icon_label,
     details: '<div><strong>' + this.name() + '</strong><br>' +
           'Category: ' + this.category()  + '<br>' +
           this.address() + '</div>'
@@ -149,40 +185,6 @@ var Place = function(data) {
   this.marker = ko.observable(marker);
   this.element = ko.observable(element);
 
-/*  this.marker().addListener('click', function() {
-    map.panTo(new google.maps.LatLng(numlat, numlng));
-    fourSquareDetails(this.url);
-    populateInfoWindow(this, infowindow);
-  });*/
 };
 
 ko.applyBindings(new ViewModel());
-
-// https://developer.foursquare.com/overview/tutorial
-
-/*function fourSquareDetails(id){
-  $fsName.text("");
-  $.getJSON(id, function(data) {
-    var venues = data.response.venue.name;
-    $fsName.text("name:" + venues);
-    console.log(venues);
-  });
-}*/
-
-/*function populateInfoWindow(marker, infowindow) {
-  // Check to make sure the infowindow is not already opened on this marker.
-  if (infowindow.marker != marker) {
-    infowindow.marker = marker;
-    infowindow.setContent('<div><strong>' + marker.title + '</strong><br>' +
-      'Category: ' + marker.category  + '<br>' +
-      marker.address + '</div>');
-    infowindow.open(map, marker);
-    // http://stackoverflow.com/questions/7339200/bounce-a-pin-in-google-maps-once
-    marker.setAnimation(google.maps.Animation.BOUNCE);
-    setTimeout(function(){ marker.setAnimation(null); }, 1400);
-    // Make sure the marker property is cleared if the infowindow is closed.
-    infowindow.addListener('closeclick', function() {
-      infowindow.marker = null;
-    });
-  }
-}*/
