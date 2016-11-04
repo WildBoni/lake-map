@@ -1,44 +1,10 @@
 var places = [
-    { name: "isola_bella", category: "panorama", id: "4bb5f9ff1344b7139acb9c04", lat: "45.89644639999999", lng: "8.526133099999999", address: "Isola Bella, 28838 Stresa VB, Italia"},
-    { name: "mottarone", category: "panorama", id: "4c274f81905a0f47eca56460", lat: "45.8833333", lng: "8.449999999999999", address: "Mottarone, 28838 Stresa VB, Italia"},
-    { name: "san_carlone", category: "architecture", id: "4da166849aa4721e1e61fa19", lat: "45.7702621", lng: "8.5431992", address: "Statua di San Carlo Borromeo, Piazzale San Carlo, 28041 Arona NO, Italia"},
-    { name: "da_Aldo", category: "restaurant", id: "4d04d10a9d33a1432e5bbd78", lat: "45.763473", lng: "8.5564403", address: "Piazza del Popolo, 26, 28041 Arona NO"},
-    { name: "scurone", category: "bar", id: "55d992b8498e8e67796eaf3e", lat: "46.0627611", lng: "8.6976934", address: "Traversa Scurone, 7, 28822 Cannobio VB"}
+    { name: "isola_bella", category: "panorama", id: "4bb5f9ff1344b7139acb9c04", lat: "45.89644639999999", lng: "8.526133099999999", address: "Isola Bella, 28838 Stresa VB, Italia", icon: "park"},
+    { name: "mottarone", category: "panorama", id: "4c274f81905a0f47eca56460", lat: "45.8833333", lng: "8.449999999999999", address: "Mottarone, 28838 Stresa VB, Italia", icon: "park"},
+    { name: "san_carlone", category: "architecture", id: "4da166849aa4721e1e61fa19", lat: "45.7702621", lng: "8.5431992", address: "Statua di San Carlo Borromeo, Piazzale San Carlo, 28041 Arona NO, Italia", icon: "architecture"},
+    { name: "da_Aldo", category: "restaurant", id: "4d04d10a9d33a1432e5bbd78", lat: "45.763473", lng: "8.5564403", address: "Piazza del Popolo, 26, 28041 Arona NO", icon: "restaurant"},
+    { name: "scurone", category: "bar", id: "55d992b8498e8e67796eaf3e", lat: "46.0627611", lng: "8.6976934", address: "Traversa Scurone, 7, 28822 Cannobio VB", icon: "bar"}
 ];
-
-// custom markers http://map-icons.com/
-// assign custom icon to each category
-var createIcons = function(category) {
-  switch(category) {
-    case "architecture":
-      path = SQUARE_PIN;
-      fillColor = '#b94545';
-      map_icon_label = '<span class="map-icon map-icon-point-of-interest"></span>';
-    break;
-    case "panorama":
-      path = MAP_PIN;
-      fillColor = '#2e8234';
-      map_icon_label = '<span class="map-icon map-icon-local-government"></span>';
-    break;
-    case "restaurant":
-      path = MAP_PIN;
-      fillColor = '#80822e';
-      map_icon_label = '<span class="map-icon map-icon-restaurant"></span>';
-    break;
-    case "bar":
-      path = MAP_PIN;
-      fillColor = '#80822e';
-      map_icon_label = '<span class="map-icon map-bar"></span>';
-    break;
-    default:
-      path = ROUTE;
-      fillColor = '#602e82';
-      map_icon_label = '<span class="map-icon map-icon-food"></span>';
-    break;
-  }
-};
-
-
 
 // Google maps basic settings
 var map;
@@ -175,23 +141,16 @@ var Place = function(data) {
   this.lat = ko.observable(data.lat);
   this.lng = ko.observable(data.lng);
   this.address = ko.observable(data.address);
-
-  createIcons(this.category());
+  this.icon = ko.observable(data.icon);
 
   var numlat = parseFloat(this.lat());
   var numlng = parseFloat(this.lng());
-
+  var customIcon = 'img/icons/'+ this.icon() + '.png';
+  console.log(customIcon);
   var marker = new Marker({
     map: map,
     position: {lat: numlat, lng: numlng},
-    icon: {
-      path: path,
-      fillColor: fillColor,
-      fillOpacity: 1,
-      strokeColor: '',
-      strokeWeight: 0
-    },
-    map_icon_label: map_icon_label,
+    icon: customIcon,
     details: '<div><strong>' + this.name() + '</strong><br>' +
           'Category: ' + this.category()  + '<br>' +
           this.address() + '</div>'
@@ -207,9 +166,6 @@ var Place = function(data) {
 
   this.marker = ko.observable(marker);
   this.element = ko.observable(element);
-  this.path = ko.observable(this.marker.path);
-  this.fillColor = ko.observable(this.marker.fillColor);
-  this.map_icon_label = ko.observable(this.marker.map_icon_label);
 };
 
 ko.applyBindings(new ViewModel());
