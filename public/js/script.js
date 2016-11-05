@@ -1,9 +1,10 @@
 var places = [
-    { name: "isola_bella", category: "panorama", id: "4bb5f9ff1344b7139acb9c04", lat: "45.89644639999999", lng: "8.526133099999999", address: "Isola Bella, 28838 Stresa VB, Italia", icon: "park"},
-    { name: "mottarone", category: "panorama", id: "4c274f81905a0f47eca56460", lat: "45.8833333", lng: "8.449999999999999", address: "Mottarone, 28838 Stresa VB, Italia", icon: "park"},
-    { name: "san_carlone", category: "architecture", id: "4da166849aa4721e1e61fa19", lat: "45.7702621", lng: "8.5431992", address: "Statua di San Carlo Borromeo, Piazzale San Carlo, 28041 Arona NO, Italia", icon: "architecture"},
-    { name: "da_Aldo", category: "restaurant", id: "4d04d10a9d33a1432e5bbd78", lat: "45.763473", lng: "8.5564403", address: "Piazza del Popolo, 26, 28041 Arona NO", icon: "restaurant"},
-    { name: "scurone", category: "bar", id: "55d992b8498e8e67796eaf3e", lat: "46.0627611", lng: "8.6976934", address: "Traversa Scurone, 7, 28822 Cannobio VB", icon: "bar"}
+    { name: "Isola Bella", category: "panorama", id: "4bb5f9ff1344b7139acb9c04", lat: "45.89644639999999", lng: "8.526133099999999", address: "28838 Stresa VB, Italia", icon: "park"},
+    { name: "Mottarone", category: "panorama", id: "4c274f81905a0f47eca56460", lat: "45.8833333", lng: "8.449999999999999", address: "28838 Stresa VB, Italia", icon: "park"},
+    { name: "San Carlone", category: "architecture", id: "4da166849aa4721e1e61fa19", lat: "45.7702621", lng: "8.5431992", address: "Piazzale San Carlo, 28041 Arona NO, Italia", icon: "architecture"},
+    { name: "Da Aldo", category: "restaurant", id: "4d04d10a9d33a1432e5bbd78", lat: "45.763473", lng: "8.5564403", address: "Piazza del Popolo, 26, 28041 Arona NO", icon: "restaurant"},
+    { name: "O'Connors Pub", category: "bar", id: "4c376ce2dfb0e21e91c1aca8", lat: "45.9396836", lng: "8.5713731", address: "Via F.lli Scavini, 5, 28921 Intra VB", icon: "bar"},
+    { name: "Il Rapanello", category: "restaurant", id: "4c76ad1b3adda1433fc30aaf", lat: "45.830247", lng: "8.564583", address: "Piazza Matteotti, 8, 28040 Lesa NO", icon: "restaurant"}
 ];
 
 // Google maps basic settings
@@ -17,7 +18,7 @@ var clientSecret = '4NPFBTCE53TLCTJ5DSGEHHVKYXWTE5X5ZDIHP35SE1N0UABR';
 
 // manage everything with konckout.js
 var ViewModel = function() {
-  var venues = 'Waiting for input';
+  var venues = 'Choose a place';
   var self = this;
   self.placesList = ko.observableArray([]);
   self.filteredCats = ko.observableArray([]);
@@ -46,16 +47,59 @@ var ViewModel = function() {
   // A click on the marker or on the list view opens up infowindow
   // And animates the pin
   self.clickPlace = function(place){
-    infowindow.setContent(place.marker().details);
-    infowindow.open(map, place.marker());
-    // http://stackoverflow.com/questions/7339200/bounce-a-pin-in-google-maps-once
-    place.marker().setAnimation(google.maps.Animation.BOUNCE);
-    setTimeout(function(){ place.marker().setAnimation(null); }, 700);
+    //infowindow.setContent(place.marker().details);
+
+    self.bounceMarker(place.marker());
     self.fourSquareDetails(place.element().url);
+
+
+    //From Udacity Course
+    //https://github.com/udacity/ud864/blob/master/Project_Code_6_StaticMapsAndStreetViewImagery.html#L248
+    var streetViewService = new google.maps.StreetViewService();
+    var radius = 50;
+    // In case the status is OK, which means the pano was found, compute the
+    // position of the streetview image, then calculate the heading, then get a
+    // panorama from that and set the options
+    function getStreetView(data, status) {
+
+      if (status == google.maps.StreetViewStatus.OK) {
+        var nearStreetViewLocation = data.location.latLng;
+        var heading = google.maps.geometry.spherical.computeHeading(
+          nearStreetViewLocation, place.marker().position);
+          infowindow.setContent('</div><div id="pano"></div><div>' +
+          place.marker().details + '</div></div>');
+          var panoramaOptions = {
+            position: nearStreetViewLocation,
+            pov: {
+              heading: heading,
+              pitch: 30
+            }
+          };
+        var panorama = new google.maps.StreetViewPanorama(
+          document.getElementById('pano'), panoramaOptions);
+      } else {
+        infowindow.setContent('<div>' + place.marker().details + '</div>' +
+          '<div>No Street View Found</div>');
+      }
+    }
+    // Use streetview service to get the closest streetview image within
+    // 50 meters of the markers position
+
+    streetViewService.getPanoramaByLocation(place.marker().position, radius, getStreetView);
+    // Open the infowindow on the correct marker.
+    infowindow.open(map, place.marker());
+
+
     /*// Make sure the marker property is cleared if the infowindow is closed.
     infowindow.addListener('closeclick', function() {
       infowindow.place.marker() = null;
     });*/
+  };
+  // Marker bounces when selected
+  // http://stackoverflow.com/questions/7339200/bounce-a-pin-in-google-maps-once
+  self.bounceMarker = function(marker){
+    marker.setAnimation(google.maps.Animation.BOUNCE);
+    setTimeout(function(){ marker.setAnimation(null); }, 1400);
   };
 
   // https://developer.foursquare.com/overview/tutorial
@@ -102,7 +146,7 @@ var ViewModel = function() {
         self.filteredCats.push(self.placesList()[i]);
         self.placesList()[i].marker().setMap(map);
         map.fitBounds(bounds);
-
+        self.bounceMarker(self.placesList()[i].marker());
       // Hide other markers
       } else {
         self.placesList()[i].marker().setMap(null);
@@ -146,7 +190,6 @@ var Place = function(data) {
   var numlat = parseFloat(this.lat());
   var numlng = parseFloat(this.lng());
   var customIcon = 'img/icons/'+ this.icon() + '.png';
-  console.log(customIcon);
   var marker = new Marker({
     map: map,
     position: {lat: numlat, lng: numlng},

@@ -12,52 +12,53 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <html>
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lake Map</title>
-  <link rel="stylesheet" type="text/css" href="css/style.css">
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDu0WvblPw9tITAxiWP6YwDzBNGG9Oj9cQ">
-  </script>
-  <!-- Knockout -->
-  <script type="text/javascript" src="../bower_components/knockout/dist/knockout.js"></script>
-  <!-- jQuery -->
-  <script type="text/javascript" src="../bower_components/jquery/dist/jquery.js"></script>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lake Map</title>
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <link rel="stylesheet" type="text/css" href="css/responsive.css">
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDu0WvblPw9tITAxiWP6YwDzBNGG9Oj9cQ&libraries=geometry&v=3">
+    </script>
+    <!-- Knockout -->
+    <script type="text/javascript" src="../bower_components/knockout/dist/knockout.js"></script>
+    <!-- jQuery -->
+    <script type="text/javascript" src="../bower_components/jquery/dist/jquery.js"></script>
 
-  <!-- Map Icons -->
-<link rel="stylesheet" type="text/css" href="css/map-icons.css">
-<script type="text/javascript" src="js/map-icons.js"></script>
+    <!-- Map Icons -->
+  <link rel="stylesheet" type="text/css" href="css/map-icons.css">
+  <script type="text/javascript" src="js/map-icons.js"></script>
 
 
-</head>
-<body>
-
-<!--  <div data-bind="visible: radioCat">
-      Categories:
-      <div><input type="radio" name="catGroup" value="all" data-bind="checked: catFilter" /> All</div>
-      <div><input type="radio" name="catGroup" value="panorama" data-bind="checked: catFilter" /> Panorama</div>
-      <div><input type="radio" name="catGroup" value="architecture" data-bind="checked: catFilter" /> Architecture</div>
-  </div>
--->
-<button data-bind="click: function() { filter('') }">All</button>
-<button data-bind="click: function() { filter('panorama') }">Panorama</button>
-<button data-bind="click: function() { filter('architecture') }">Architecture</button>
-<button data-bind="click: function() { filter('restaurant') }">Restaurant</button>
-<div id="map"></div>
-<div data-bind="click: function() { filter('') }">All</div>
-<div id="list">
-  <ul data-bind="foreach: filteredCats">
-    <li data-bind="text:  name, click: $parent.selectedPlace"></li>
-  </ul>
-</div>
-<div>
-  <h1 id ="foursquare">FourSquare</h1>
-  <p>Name: <span data-bind="text: fsName"></span></p>
-  <p>Rating: <span data-bind="text: fsRating"></span></p>
-</div>
-<!--<div data-bind="foreach: filterCats">
-  <div data-bind="text: name"></div>
-</div>-->
-<script src="js/script.js"></script>
-</body>
+  </head>
+  <body>
+  <nav>
+    <button class="all" data-bind="click: function() { filter('') }">All</button>
+    <button data-bind="click: function() { filter('panorama') }">Panorama</button>
+    <button data-bind="click: function() { filter('architecture') }">Architecture</button>
+    <button data-bind="click: function() { filter('restaurant') }">Restaurant</button>
+    <button data-bind="click: function() { filter('bar') }">Bar</button>
+  </nav>
+  <main>
+    <div id="map">
+    </div>
+    <div class="flex-container">
+      <div class="knockoutList">
+        <div class="knockoutAll" data-bind="click: function() { filter('') }">Places
+        </div>
+        <div id="list">
+          <ul data-bind="foreach: filteredCats">
+            <li data-bind="text:  name, click: $parent.selectedPlace"></li>
+          </ul>
+        </div>
+      </div>
+      <div class="apiDetails">
+        <h2 id ="foursquare">FourSquare</h2>
+        <p>Name: <span data-bind="text: fsName"></span></p>
+        <p>Rating: <span data-bind="text: fsRating"></span></p>
+      </div>
+    </div>
+  </main>
+  <script src="js/script.js"></script>
+  </body>
 </html>

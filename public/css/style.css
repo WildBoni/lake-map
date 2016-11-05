@@ -2,8 +2,100 @@ html, body {
   margin: 0;
   padding: 0;
   height: 100%;
+  font-family: Arial;
+  font-size: 14px;
+}
+
+h2 {
+  padding: 0px;
+  margin: 0px;
+  font-size: 18px;
+}
+
+nav {
+  box-sizing: border-box;
+  height: 48px;
+  padding: 5px;
+}
+
+main {
+ height: calc(100% - 48px);
 }
 
 #map {
   height: 75%;
+}
+
+#pano {
+  width:220px;
+  height: 150px;
+  margin: 10px 0;
+}
+
+.flex-container {
+  display: flex;
+  flex-wrap: wrap;
+  height: 25%;
+}
+
+button {
+  color: #fff;
+  background: #3498db;
+  padding: 10px 20px;
+  margin: 2px;
+  text-decoration: none;
+  border: none;
+}
+
+button:hover {
+  background: #5fc4fa;
+  text-decoration: none;
+}
+
+button.all {
+  background: #1e6899;
+}
+
+button.all:hover {
+  background: #69a3c1;
+  text-decoration: none;
+}
+
+.knockoutList {
+  background-color: #ede;
+  width: 50%;
+  box-sizing: border-box;
+  padding: 10px;
+  overflow: auto;
+}
+
+.knockoutAll {
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.knockoutList ul {
+  list-style: none;
+  margin: 0;
+  padding: 4px;
+}
+
+.knockoutList li {
+  padding: 2px;
+  cursor: pointer;
+}
+
+.knockoutList li:hover {
+  background-color: #1e6899;
+  color: #fff;
+}
+
+.apiDetails {
+  padding: 10px;
+  width: 50%;
+  background-color: #1e6899;
+  box-sizing: border-box;
+  color: #fff;
+  overflow: auto;
 }
