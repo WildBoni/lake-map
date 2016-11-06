@@ -73,7 +73,7 @@ var ViewModel = function() {
             position: nearStreetViewLocation,
             pov: {
               heading: heading,
-              pitch: 30
+              pitch: 15
             }
           };
         var panorama = new google.maps.StreetViewPanorama(
@@ -186,7 +186,7 @@ var Place = function(data) {
   var numlat = parseFloat(this.lat());
   var numlng = parseFloat(this.lng());
   var customIcon = 'img/icons/'+ this.icon() + '.png';
-  var marker = new Marker({
+  var marker = new google.maps.Marker({
     map: map,
     position: {lat: numlat, lng: numlng},
     icon: customIcon,

@@ -8,11 +8,13 @@
   }
 
   #map {
-    height: 65%;
+    height: 70%;
   }
 
-  .flex-container {
-    height: 35%;
+  .knockoutList {
+    height: 30%;
   }
-
+  .apiDetails {
+    height: 30%;
+  }
 }
