@@ -21,7 +21,7 @@ These are the main features (please note that the project is still under develop
 
 - [X] Bower for retrieving jQuery and Knockout libraries
 - [X] Knockout.js filtering for places and categories
-- [] Firebase database for storing places
+- [ ] Firebase database for storing places
 
 ### Online version
 
