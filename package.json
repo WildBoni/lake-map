@@ -17,6 +17,6 @@
   },
   "homepage": "https://github.com/WildBoni/lake-map#readme",
   "devDependencies": {
-    "gulp": "^3.9.1",
+    "gulp": "^3.9.1"
   }
 }

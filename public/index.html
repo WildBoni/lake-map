@@ -1,17 +1,19 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta charset="utf-8" />
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lake Map</title>
-    <link rel="stylesheet" type="text/css" href="css/style.css">
-    <link rel="stylesheet" type="text/css" href="css/responsive.css">
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDu0WvblPw9tITAxiWP6YwDzBNGG9Oj9cQ&libraries=geometry&v=3">
-    </script>
+    <link rel="shortcut icon" type="image/png" href="img/favicon.png">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <script src="js/script.js"></script>
     <!-- Knockout -->
-    <script type="text/javascript" src="js/libraries/knockout.js"></script>
+    <script src="js/libraries/knockout.js"></script>
     <!-- jQuery -->
-    <script type="text/javascript" src="js/libraries/jquery.js"></script>
+    <script src="js/libraries/jquery.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDu0WvblPw9tITAxiWP6YwDzBNGG9Oj9cQ&libraries=geometry&v=3&callback=initMap" async defer>
+    </script>
   </head>
   <body>
   <nav>
@@ -24,8 +26,8 @@
   <main class="flex-container">
     <div id="map">
     </div>
-    <div class="knockoutList">
-      <div class="knockoutAll" data-bind="click: function() { filter('') }">Places
+    <div class="knockout-list">
+      <div class="knockout-all" data-bind="click: function() { filter('') }">Places
       </div>
       <div id="list">
         <ul data-bind="foreach: filteredCats">
@@ -33,12 +35,11 @@
         </ul>
       </div>
     </div>
-    <div class="apiDetails">
-      <h2 id ="foursquare">FourSquare</h2>
+    <div class="api-details">
+      <h2 data-bind="text: fourSquareError" id ="foursquare">FourSquare</h2>
       <p>Name: <span data-bind="text: fsName"></span></p>
       <p>Rating: <span data-bind="text: fsRating"></span></p>
     </div>
   </main>
-  <script src="js/script.js"></script>
   </body>
 </html>

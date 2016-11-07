@@ -1,4 +1,5 @@
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
   height: 100%;
@@ -7,8 +8,8 @@ html, body {
 }
 
 h2 {
-  padding: 0px;
-  margin: 0px;
+  padding: 0;
+  margin: 0;
   font-size: 18px;
 }
 
@@ -61,7 +62,7 @@ button.all:hover {
   text-decoration: none;
 }
 
-.knockoutList {
+.knockout-list {
   background-color: #ede;
   width: 50%;
   box-sizing: border-box;
@@ -70,29 +71,29 @@ button.all:hover {
   height: 25%;
 }
 
-.knockoutAll {
+.knockout-all {
   font-size: 18px;
   font-weight: bold;
   cursor: pointer;
 }
 
-.knockoutList ul {
+.knockout-list ul {
   list-style: none;
   margin: 0;
   padding: 4px;
 }
 
-.knockoutList li {
+.knockout-list li {
   padding: 2px;
   cursor: pointer;
 }
 
-.knockoutList li:hover {
+.knockout-list li:hover {
   background-color: #1e6899;
   color: #fff;
 }
 
-.apiDetails {
+.api-details {
   padding: 10px;
   width: 50%;
   background-color: #1e6899;

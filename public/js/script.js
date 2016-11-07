@@ -17,6 +17,14 @@ var bounds = new google.maps.LatLngBounds();
 var clientId = 'CEE3OEEHN1QL2SS1MWKVTAH5L0MYPWFQFSGI2NZWKWMSEXIL';
 var clientSecret = '4NPFBTCE53TLCTJ5DSGEHHVKYXWTE5X5ZDIHP35SE1N0UABR';
 
+// Initialize Google Map
+var initMap = function() {
+  map = new google.maps.Map(document.getElementById('map'), {
+    center: {lat: 45.924453, lng: 8.556276},
+    zoom: 11
+  });
+};
+
 // Let's code using knockout.js best practices
 var ViewModel = function() {
   // A useful trick for keeping track of this in scopes
@@ -26,6 +34,7 @@ var ViewModel = function() {
   self.placesList = ko.observableArray([]);
   self.filteredCats = ko.observableArray([]);
   self.catFilter = ko.observable();
+  self.fourSquareError = ko.observable();
 
   // Some Knockout observables for FourSquare infobox
   var venues = 'Choose a place';
@@ -44,7 +53,7 @@ var ViewModel = function() {
   // Adding a click listener on each marker
   self.markersClick = function(){
     self.placesList().forEach(function(place){
-      google.maps.event.addListener(place.marker(), 'click', function(){
+      google.maps.event.addListener(place.marker, 'click', function(){
         self.clickPlace(place);
       });
     });
@@ -53,8 +62,8 @@ var ViewModel = function() {
   // A click on the marker or on the list view opens up infowindow,
   // animates the pin and updates FourSquare details box
   self.clickPlace = function(place){
-    self.bounceMarker(place.marker());
-    self.fourSquareDetails(place.element().url);
+    self.bounceMarker(place.marker);
+    self.fourSquareDetails(place.element.url);
     // Getting a cool StreeView of the selected place as seen in Udacity Course
     // https://github.com/udacity/ud864/blob/master/Project_Code_6_StaticMapsAndStreetViewImagery.html#L248
     var streetViewService = new google.maps.StreetViewService();
@@ -66,9 +75,9 @@ var ViewModel = function() {
       if (status == google.maps.StreetViewStatus.OK) {
         var nearStreetViewLocation = data.location.latLng;
         var heading = google.maps.geometry.spherical.computeHeading(
-          nearStreetViewLocation, place.marker().position);
+          nearStreetViewLocation, place.marker.position);
           infowindow.setContent('<div id="pano"></div><div>' +
-          place.marker().details + '</div>');
+          place.marker.details + '</div>');
           var panoramaOptions = {
             position: nearStreetViewLocation,
             pov: {
@@ -79,13 +88,13 @@ var ViewModel = function() {
         var panorama = new google.maps.StreetViewPanorama(
           document.getElementById('pano'), panoramaOptions);
       } else {
-        infowindow.setContent('<div>' + place.marker().details + '</div>' +
+        infowindow.setContent('<div>' + place.marker.details + '</div>' +
           '<div>No Street View Found</div>');
       }
     }
-    streetViewService.getPanoramaByLocation(place.marker().position, radius, getStreetView);
+    streetViewService.getPanoramaByLocation(place.marker.position, radius, getStreetView);
     // Open the infowindow on the correct marker.
-    infowindow.open(map, place.marker());
+    infowindow.open(map, place.marker);
   };
 
   // Marker bounces when selected
@@ -99,10 +108,6 @@ var ViewModel = function() {
   // This tutorial is great for understanging how fourSquare APIs work
   // https://developer.foursquare.com/overview/tutorial
   self.fourSquareDetails = function(url){
-    // If something goes wrong, this warning will be displayed
-    var foursquareRequestTimeout = setTimeout(function(){
-      $('#foursquare').text("Uh Oh... FourSquare is not responding!");
-    }, 6000);
     // If the jsonp data gets retrieved correctly, we'll take infos on the
     // venue name and rating
     $.ajax( {
@@ -110,10 +115,20 @@ var ViewModel = function() {
         dataType: 'jsonp',
     }).done(function( data ) {
       var venue = data.response.venue.name;
-      var rating = data.response.venue.rating;
-      self.fsName(venue);
-      self.fsRating(rating);
-      clearTimeout(foursquareRequestTimeout);
+      var rating = data.response.venue.ratidng;
+      if(venue !== undefined) {
+        self.fsName(venue);
+      } else {
+        self.fsName('data is not available');
+      }
+      if(rating !== undefined) {
+        self.fsRating(venue);
+      } else {
+        self.fsRating('data is not available');
+      }
+    }).fail(function (jqXHR, textStatus) {
+    // error handling
+    self.fourSquareError("Uh Oh... FourSquare is not responding!");
     });
   };
 
@@ -142,12 +157,12 @@ var ViewModel = function() {
       if (self.placesList()[i].category().indexOf(category) > -1) {
         // Populate the array with places from the chosen category
         self.filteredCats.push(self.placesList()[i]);
-        self.placesList()[i].marker().setMap(map);
+        self.placesList()[i].marker.setVisible(true);
         map.fitBounds(bounds);
-        self.bounceMarker(self.placesList()[i].marker());
+        self.bounceMarker(self.placesList()[i].marker);
       // Hide other markers
       } else {
-        self.placesList()[i].marker().setMap(null);
+        self.placesList()[i].marker.setVisible(false);
       }
     }
   };
@@ -155,7 +170,7 @@ var ViewModel = function() {
   // Choosing a place from the list
   self.selectedPlace = function(place){
     // Centers the map on the selected marker
-    map.panTo(new google.maps.LatLng(place.marker().position.lat(), place.marker().position.lng()));
+    map.panTo(new google.maps.LatLng(place.marker.position.lat(), place.marker.position.lng()));
     map.setZoom(12);
     self.clickPlace(place);
   };
@@ -163,7 +178,7 @@ var ViewModel = function() {
   // Adding a Dom listener: when everything is fine, launch the app
   // https://developers.google.com/maps/documentation/javascript/events#DomEvents
   google.maps.event.addDomListener(window, 'load', function(){
-    self.initMap();
+    initMap();
     self.loadPlaces();
     map.fitBounds(bounds);
     self.filteredCats(self.placesList());
@@ -174,37 +189,37 @@ var ViewModel = function() {
 
 // Some info about the Place
 var Place = function(data) {
-  this.name = ko.observable(data.name);
+  this.name = data.name;
   this.category = ko.observable(data.category);
-  this.id = ko.observable(data.id);
+  this.id = data.id;
   this.show = ko.observable(data.show);
-  this.lat = ko.observable(data.lat);
-  this.lng = ko.observable(data.lng);
-  this.address = ko.observable(data.address);
-  this.icon = ko.observable(data.icon);
+  this.lat = data.lat;
+  this.lng = data.lng;
+  this.address = data.address;
+  this.icon = data.icon;
   // Transforming lat and lng strings in numbers.
-  var numlat = parseFloat(this.lat());
-  var numlng = parseFloat(this.lng());
-  var customIcon = 'img/icons/'+ this.icon() + '.png';
+  var numlat = parseFloat(this.lat);
+  var numlng = parseFloat(this.lng);
+  var customIcon = 'img/icons/'+ this.icon + '.png';
   var marker = new google.maps.Marker({
     map: map,
     position: {lat: numlat, lng: numlng},
     icon: customIcon,
-    details: '<div><strong>' + this.name() + '</strong><br>' +
+    details: '<div><strong>' + this.name + '</strong><br>' +
           'Category: ' + this.category()  + '<br>' +
-          this.address() + '</div>'
+          this.address + '</div>'
   });
   // Place has its own FourSquare id and url
   var element = {
-    id: this.id(),
-    url: 'https://api.foursquare.com/v2/venues/' + this.id() + '?client_id='+ clientId +
+    id: this.id,
+    url: 'https://api.foursquare.com/v2/venues/' + this.id + '?client_id='+ clientId +
     '&client_secret=' + clientSecret + '&v=20130815'
   };
 
   bounds.extend(marker.getPosition());
 
-  this.marker = ko.observable(marker);
-  this.element = ko.observable(element);
+  this.marker = marker;
+  this.element = element;
 };
 
 ko.applyBindings(new ViewModel());

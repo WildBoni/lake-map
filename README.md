@@ -35,8 +35,9 @@ You can see the online optimized version at [https://wildboni.github.io/lake-map
   git clone https://github.com/WildBoni/lake-map.git
   ```
 
-2. Open the public/index.html file in your browser
-###### If you would like to recreate the working environment, do as follows:
+2. Open the public/index.html file in your favourite browser and the app is ready to run!
+
+##### If you would like to recreate the working environment, do as follows:
 
 3. Install [Node.js](https://nodejs.org/)
 
