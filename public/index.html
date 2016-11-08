@@ -7,13 +7,6 @@
     <link rel="shortcut icon" type="image/png" href="img/favicon.png">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/responsive.css">
-    <script src="js/script.js"></script>
-    <!-- Knockout -->
-    <script src="js/libraries/knockout.js"></script>
-    <!-- jQuery -->
-    <script src="js/libraries/jquery.js"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDu0WvblPw9tITAxiWP6YwDzBNGG9Oj9cQ&libraries=geometry&v=3&callback=initMap" async defer>
-    </script>
   </head>
   <body>
   <nav>
@@ -41,5 +34,12 @@
       <p>Rating: <span data-bind="text: fsRating"></span></p>
     </div>
   </main>
+  <!-- Knockout -->
+  <script src="js/libraries/knockout.js"></script>
+  <!-- jQuery -->
+  <script src="js/libraries/jquery.js"></script>
+  <script src="js/script.js"></script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDu0WvblPw9tITAxiWP6YwDzBNGG9Oj9cQ&libraries=geometry&v=3&callback=initMap"  onerror="errorMessage()" async defer>
+  </script>
   </body>
 </html>

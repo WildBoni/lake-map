@@ -9,21 +9,11 @@ var places = [
 ];
 
 // Google maps basic settings
-var map;
-var infowindow = new google.maps.InfoWindow();
-var bounds = new google.maps.LatLngBounds();
+var map, infowindow, bounds;
 
 // FourSquare API access credentials
 var clientId = 'CEE3OEEHN1QL2SS1MWKVTAH5L0MYPWFQFSGI2NZWKWMSEXIL';
 var clientSecret = '4NPFBTCE53TLCTJ5DSGEHHVKYXWTE5X5ZDIHP35SE1N0UABR';
-
-// Initialize Google Map
-var initMap = function() {
-  map = new google.maps.Map(document.getElementById('map'), {
-    center: {lat: 45.924453, lng: 8.556276},
-    zoom: 11
-  });
-};
 
 // Let's code using knockout.js best practices
 var ViewModel = function() {
@@ -40,15 +30,6 @@ var ViewModel = function() {
   var venues = 'Choose a place';
   self.fsName = ko.observable(venues);
   self.fsRating = ko.observable(venues);
-
-  // Event Listener for initializing map as suggested in this StackOverflow thread
-  // http://stackoverflow.com/questions/36267158/uncaught-referenceerror-google-is-not-defined
-  self.initMap = function() {
-    map = new google.maps.Map(document.getElementById('map'), {
-      center: {lat: 45.924453, lng: 8.556276},
-      zoom: 11
-    });
-  };
 
   // Adding a click listener on each marker
   self.markersClick = function(){
@@ -115,14 +96,14 @@ var ViewModel = function() {
         dataType: 'jsonp',
     }).done(function( data ) {
       var venue = data.response.venue.name;
-      var rating = data.response.venue.ratidng;
+      var rating = data.response.venue.rating;
       if(venue !== undefined) {
         self.fsName(venue);
       } else {
         self.fsName('data is not available');
       }
       if(rating !== undefined) {
-        self.fsRating(venue);
+        self.fsRating(rating);
       } else {
         self.fsRating('data is not available');
       }
@@ -148,6 +129,8 @@ var ViewModel = function() {
   // http://www.knockmeout.net/2011/04/utility-functions-in-knockoutjs.html
   self.filterCats = function(category) {
     self.catFilter(category);
+    // Close any infowindow
+    infowindow.close();
     // Empty the observable array
     self.filteredCats([]);
     // Loop through the whole places list
@@ -178,7 +161,6 @@ var ViewModel = function() {
   // Adding a Dom listener: when everything is fine, launch the app
   // https://developers.google.com/maps/documentation/javascript/events#DomEvents
   google.maps.event.addDomListener(window, 'load', function(){
-    initMap();
     self.loadPlaces();
     map.fitBounds(bounds);
     self.filteredCats(self.placesList());
@@ -222,4 +204,20 @@ var Place = function(data) {
   this.element = element;
 };
 
-ko.applyBindings(new ViewModel());
+// Initialize Google Map
+initMap = function() {
+  map = new google.maps.Map(document.getElementById('map'), {
+    center: {lat: 45.924453, lng: 8.556276},
+    zoom: 11
+  });
+
+  infowindow = new google.maps.InfoWindow();
+  bounds = new google.maps.LatLngBounds();
+
+  ko.applyBindings(new ViewModel());
+};
+
+// Initialize Google Map
+function errorMessage() {
+  $("#map").html("<h1>Uh Oh...<br>It may seem impossible, but Google Maps is not responding!</h1>");
+}
