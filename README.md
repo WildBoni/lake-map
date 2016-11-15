@@ -39,25 +39,25 @@ You can see the online optimized version at [https://wildboni.github.io/lake-map
 
 ##### If you would like to recreate the working environment, do as follows:
 
-3. Install [Node.js](https://nodejs.org/)
+1. Install [Node.js](https://nodejs.org/)
 
-4. Install [Bower](https://bower.io/)
+2. Install [Bower](https://bower.io/)
 
-5.  Open command line and
+3.  Open command line and
   ``` sh
   $> cd /path/to/your-project-folder
   $> npm install
   ```
 ###### Now gulp.js and all its dependencies are ready to run!
 
-6. Navigate to your project folder and
+4. Navigate to your project folder and
 
   ```
   $ bower install
   ```
 ###### This will download bower dependencies used in the project (Jquery and Knockout)
 
-7. To eventually update the libraries in the app folder, navigate to your project folder and
+5. To eventually update the libraries in the app folder, navigate to your project folder and
 
   ```
   $ gulp
